@@ -173,10 +173,74 @@ def foo := let a := Nat; fun x : a => x + 2
 /-  My guess is that since the expression has to make sense without considering
     the type that is given as an argument for a, and the add operation is not
     defined for every possible type that can be passed as an argument, this
-    function will always fail to typecheck. The first one typechecks successfully
+    expression will always fail to typecheck.
      -/
 -- def bar := (fun a => fun x : a => x + 2) Nat
 
 
 #check foo
-#check bar
+--#check bar
+
+section useful
+
+    variable (α β γ: Type)
+    variable (g: β → γ) (f: α → β)  (x: α) (h: α → α)
+
+    def compose2 (g: β → γ) (f: α → β) (x: α) :=
+        g (f x)
+
+    #check compose2
+
+    /- Definitions using only the variables that we defined beforehand -/
+
+
+    def compose3 :=
+        g (f x)
+
+    def doTwice1 :=
+        h (h x)
+
+    def doThrice :=
+        h (h (h x))
+
+    #check compose3
+    #check doTwice1
+    #check doThrice
+
+end useful
+
+namespace Foo
+    def a : Int := 3
+    def f (x: Nat) : Nat := x + 7
+end Foo
+
+#check @List.cons
+#check @List.nil
+#check @List.length
+#check @List.append
+
+
+namespace depPairs
+    universe w v
+    def h (α : Type w) (β : α → Type v) (a : α) (b : β a) : α × β a :=
+        (a, b)
+
+    def i (α : Type w) (β : α → Type v) (a : α) (b: β a) : Σ a : α, β a :=
+        Sigma.mk a b
+
+    def h1 (x : Nat) : Nat :=
+        (h Type (fun α => α) Nat x).2
+
+end depPairs
+
+#check depPairs.h
+#check depPairs.i
+#check depPairs.h1
+#eval depPairs.h1 4
+
+#check List          -- Lst.{u} (α : Type u) : Type u
+#check List.cons     -- Lst.cons.{u} (α : Type u) (a : α) (as : Lst α) : Lst α
+#check List.nil      -- Lst.nil.{u} (α : Type u) : Lst α
+#check List.append   -- Lst.append.{u} (α : Type u) (as bs : Lst α) : Lst α
+
+#check List.cons Nat
