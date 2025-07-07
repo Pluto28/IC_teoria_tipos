@@ -175,3 +175,6 @@ example (h : ¬(p ∧ q)) : ¬p ∨ ¬q :=
         )
       )
   )
+
+
+#check em p
